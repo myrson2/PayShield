@@ -39,6 +39,9 @@ Every agent reviewing or touching this codebase **must enforce** the following i
    - Must use `asyncio.to_thread` or Starlette threadpools.
 6. **Unified Authentication Dependency**:
    - Protected routes must depend on a single dependency (`get_current_user`).
+7. **Version-Controlled Schema Migrations (Alembic)**:
+   - Database schema must be created and evolved via Alembic migrations, never ad-hoc `create_all()` in production code.
+   - Alembic `env.py` must configure `render_as_batch=True` to support SQLite table and constraint alterations.
 
 ---
 
@@ -46,12 +49,16 @@ Every agent reviewing or touching this codebase **must enforce** the following i
 
 When the user asks for a review of their code, verify against these criteria:
 
-### Milestone 1 (Models & DB)
-- [ ] SQLAlchemy models defined for `User`, `Session`, and `PayrollRecord`.
-- [ ] `Session` table has foreign key to `User.id` with cascade deletion.
-- [ ] `session_token` column indexed, unique, and typed `String(64)`.
-- [ ] `Session` records `user_agent` (`String(255)`) and `ip_address` (`String(45)`).
-- [ ] `expires_at` column uses datetime with UTC convention.
+### Milestone 1 (Models, DB & Alembic Migrations) ✅ [COMPLETED]
+- [x] SQLAlchemy models defined for `User`, `Session`, and `PayrollRecord`.
+- [x] `Session` table has foreign key to `User.id` with cascade deletion.
+- [x] `session_token` column indexed, unique, and typed `String(64)`.
+- [x] `Session` records `user_agent` (`String(255)`) and `ip_address` (`String(45)`).
+- [x] `expires_at` column uses datetime with UTC convention.
+- [x] Alembic initialized (`alembic.ini`, migration environment configured).
+- [x] `env.py` binds `target_metadata = Base.metadata` and sets `render_as_batch=True` for SQLite compatibility.
+- [x] Initial migration generated and executed cleanly with `alembic upgrade head`.
+- [x] Edge-case test suite (`test_models.py`) passes 100%.
 
 ### Milestone 2 (Security Utilities)
 - [ ] `hash_token_sha256(token: str) -> str` returns 64-character hex digest.

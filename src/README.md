@@ -74,10 +74,13 @@ In corporate HR and payroll systems, security failures lead to direct compliance
 
 You will build this project step-by-step. After each milestone, your Senior Tutor will review your implementation, analyze design choices, and guide you to the next step.
 
-### 📌 Milestone 1: Database Setup & Domain Models (`database.py`, `models.py`)
+### 📌 Milestone 1: Database Setup, Domain Models & Migrations (`database.py`, `models.py`, `alembic/`)
 - Configure SQLite database engine with thread check disabled (`check_same_thread=False`).
 - Write the SQLAlchemy models: `User`, `Session`, and `PayrollRecord`.
 - Ensure proper relationships, cascade deletion, and indexing on `session_token`.
+- Initialize Alembic (`alembic init`) and configure `env.py` to point to `Base.metadata`.
+- Enable `render_as_batch=True` in Alembic for SQLite compatibility with constraint alterations.
+- Generate and apply the initial migration (`alembic upgrade head`) to establish version-controlled DDL.
 
 ### 📌 Milestone 2: Cryptographic Security Utilities (`security.py`)
 - Implement `hash_token_sha256(token: str) -> str`.
@@ -89,7 +92,7 @@ You will build this project step-by-step. After each milestone, your Senior Tuto
 - `list_user_sessions`: Retrieve active devices/sessions for the authenticated employee.
 - `revoke_session`: Invalidate a specific session ID (or all sessions on a user logout).
 
-### 📌 Milestone 4: FastAPI Web Application & Routes (`main.py`)
+### 📌 Milestone 4: FastAPI Web Application & Routes (`../main.py`)
 - Auth endpoints:
   - `POST /auth/register`: Onboard an employee.
   - `POST /auth/login`: Authenticate and set `Set-Cookie: session_id=...` with `HttpOnly` and `SameSite=Lax`.
@@ -121,5 +124,5 @@ python -m venv venv
 .\venv\Scripts\Activate.ps1
 
 # Install dependencies:
-pip install fastapi uvicorn[standard] sqlalchemy bcrypt httpx pytest pytest-asyncio
+pip install fastapi uvicorn[standard] sqlalchemy alembic bcrypt httpx pytest pytest-asyncio
 ```

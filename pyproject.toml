@@ -1,0 +1,29 @@
+[project]
+name = "payshield"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "crym_o", email = "beros.josemyrson.oreo1@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "alembic>=1.20.1",
+    "alembic>=1.13.0",
+    "bcrypt>=5.0.0",
+    "fastapi>=0.162.0",
+    "httpx>=0.28.1",
+    "pytest>=9.2.0",
+    "pytest-asyncio>=1.4.1",
+    "sqlalchemy>=2.1.6",
+    "uvicorn[standard]>=0.54.0",
+    "dotenv>=0.9.9",
+    "python-dotenv>=1.2.4",
+]
+
+[project.scripts]
+payshield = "payshield:main"
+
+[build-system]
+requires = ["uv_build>=0.12.9,<0.13.0"]
+build-backend = "uv_build"
