@@ -60,10 +60,11 @@ When the user asks for a review of their code, verify against these criteria:
 - [x] Initial migration generated and executed cleanly with `alembic upgrade head`.
 - [x] Edge-case test suite (`test_models.py`) passes 100%.
 
-### Milestone 2 (Security Utilities)
-- [ ] `hash_token_sha256(token: str) -> str` returns 64-character hex digest.
-- [ ] `async_hash_password` and `async_verify_password` use `asyncio.to_thread`.
-- [ ] UTF-8 encoding handled cleanly with bcrypt.
+### Milestone 2 (Security Utilities) ✅ [COMPLETED]
+- [x] `hash_token_256(token: str) -> str` returns 64-character hex digest.
+- [x] `async_hash_password` and `async_verify_password` use `asyncio.to_thread`.
+- [x] UTF-8 encoding handled cleanly with bcrypt.
+- [x] `test_security.py` passes 100% (8 tests).
 
 ### Milestone 3 (Session Service / DB Queries)
 - [ ] Generates raw UUIDv4 for cookie, saves SHA-256 in DB.

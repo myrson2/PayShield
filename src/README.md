@@ -82,9 +82,11 @@ You will build this project step-by-step. After each milestone, your Senior Tuto
 - Enable `render_as_batch=True` in Alembic for SQLite compatibility with constraint alterations.
 - Generate and apply the initial migration (`alembic upgrade head`) to establish version-controlled DDL.
 
-### 📌 Milestone 2: Cryptographic Security Utilities (`payshield/security.py`)
-- Implement `hash_token_sha256(token: str) -> str`.
-- Implement non-blocking password hashing and verification using `asyncio.to_thread(bcrypt.hashpw, ...)` and `asyncio.to_thread(bcrypt.checkpw, ...)`.
+### 📌 Milestone 2: Cryptographic Security Utilities (`payshield/security.py`, `test_security.py`) ✅ [COMPLETED]
+- [x] Implement `hash_token_256(token: str) -> str` returning 64-character lowercase SHA-256 hex digest.
+- [x] Implement non-blocking password hashing and verification using `asyncio.to_thread(hash_password, ...)` and `asyncio.to_thread(verify_password, ...)`.
+- [x] Handle UTF-8 encoding and decoding cleanly for `bcrypt` byte inputs and string storage.
+- [x] Create comprehensive automated test suite (`test_security.py`) verifying determinism, collision resistance, salting uniqueness, and async threadpool offloading.
 
 ### 📌 Milestone 3: Session Service & Device Audit Management (`session_service.py`)
 - `create_session`: Generate raw UUIDv4, hash it, store with `user_agent` and `ip_address`, return `raw_token`.
