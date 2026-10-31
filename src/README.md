@@ -82,7 +82,7 @@ You will build this project step-by-step. After each milestone, your Senior Tuto
 - Enable `render_as_batch=True` in Alembic for SQLite compatibility with constraint alterations.
 - Generate and apply the initial migration (`alembic upgrade head`) to establish version-controlled DDL.
 
-### 📌 Milestone 2: Cryptographic Security Utilities (`security.py`)
+### 📌 Milestone 2: Cryptographic Security Utilities (`payshield/security.py`)
 - Implement `hash_token_sha256(token: str) -> str`.
 - Implement non-blocking password hashing and verification using `asyncio.to_thread(bcrypt.hashpw, ...)` and `asyncio.to_thread(bcrypt.checkpw, ...)`.
 
