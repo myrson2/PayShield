@@ -54,10 +54,10 @@ def get_db():
         db.close()
 
 
-class User(Base):
+class UserModel(Base):
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     username: Mapped[str] = mapped_column(String(50), unique=True, index=True, nullable=False)
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -69,21 +69,21 @@ class User(Base):
     )
 
     # Relationships
-    sessions: Mapped[List["Session"]] = relationship(
+    sessions: Mapped[List["SessionModel"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan"
     )
-    payroll_record: Mapped[Optional["PayrollRecord"]] = relationship(
+    payroll_record: Mapped[Optional["PayrollRecordModel"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
         uselist=False
     )
 
 
-class Session(Base):
+class SessionModel(Base):
     __tablename__ = "sessions"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False
@@ -105,13 +105,13 @@ class Session(Base):
     )
 
     # Relationship back to User
-    user: Mapped["User"] = relationship(back_populates="sessions")
+    user: Mapped["UserModel"] = relationship(back_populates="sessions")
 
 
-class PayrollRecord(Base):
+class PayrollRecordModel(Base):
     __tablename__ = "payroll_records"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"),
         unique=True,
@@ -129,4 +129,11 @@ class PayrollRecord(Base):
     )
 
     # Relationship back to User
-    user: Mapped["User"] = relationship(back_populates="payroll_record")
+    user: Mapped["UserModel"] = relationship(back_populates="payroll_record")
+
+
+# Aliases for backward compatibility
+User = UserModel
+Session = SessionModel
+PayrollRecord = PayrollRecordModel
+
