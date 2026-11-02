@@ -105,19 +105,21 @@ class SessionService:
     def list_user_sessions(
             self,
             user_id: int,
-            active_only: bool = True
-    ) -> list[SessionModel]:
+    ) -> list[SessionResponse]:
         """
         Retrieve sessions associated with an employee.
 
         Args:
             user_id: The employee ID.
-            active_only: If True, filters out expired sessions.
 
         Returns:
             List of session records ordered by created_at descending.
         """
-        pass
+        sessions = self.repository.get_list_session(user_id=user_id)
+
+        return [
+            SessionResponse.model_validate(session) for session in sessions
+        ]
 
     def revoke_session(
             self,
@@ -134,7 +136,7 @@ class SessionService:
         Returns:
             True if the session was found, authorized, and deleted; False otherwise.
         """
-        pass
+        return self.repository.delete_session(session_id, user_id)
 
     def revoke_all_sessions(
             self,
@@ -151,4 +153,4 @@ class SessionService:
         Returns:
             int: Total number of sessions revoked.
         """
-        pass
+        return self.repository.delete_all_session(user_id, keep_session_id)

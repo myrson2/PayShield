@@ -1,5 +1,7 @@
 from datetime import datetime, timezone
-from sqlalchemy import select
+from typing import Optional
+
+from sqlalchemy import select, delete
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from sqlalchemy.orm import Session
 
@@ -41,10 +43,37 @@ class SessionRepository(BaseRepository):
         get_token = select(SessionModel).where(SessionModel.session_token == token)
         return self.db.scalar(get_token)
 
-    def get_list_session(self, user_id: int, active_only: bool = True) -> list[SessionModel]:
-        stmt = select(SessionModel).where(SessionModel.user_id == user_id)
-        if active_only:
-            now = datetime.now(timezone.utc)
-            stmt = stmt.where(SessionModel.expires_at > now)
-        stmt = stmt.order_by(SessionModel.created_at.desc())
+    def get_list_session(self, user_id: int) -> list[SessionModel]:
+        stmt = (select(SessionModel)
+                .where(SessionModel.user_id == user_id,
+                       SessionModel.expires_at > datetime.now(timezone.utc))
+                ).order_by(SessionModel.created_at.desc())
         return list(self.db.scalars(stmt).all())
+
+    def delete_session(self, session_id: int, user_id: Optional[int] = None) -> bool:
+        stmt = select(SessionModel).where(SessionModel.id == session_id)
+        if user_id is not None:
+            stmt = stmt.where(SessionModel.user_id == user_id)
+
+        session = self.db.scalar(stmt)
+        if not session:
+            return False
+        self.db.delete(session)
+        self.db.commit()
+        return True
+
+    def delete_all_session(self, user_id: int, excluded_session_id: Optional[int] = None) -> int:
+        stmt = select(SessionModel).where(SessionModel.user_id == user_id)
+        if excluded_session_id is not None:
+            stmt = stmt.where(SessionModel.id != excluded_session_id)
+
+        result = list(self.db.scalars(stmt).all())
+
+        if not result:
+            return 0
+
+        for session in result:
+            self.db.delete(session)
+
+        self.db.commit()
+        return len(result)
