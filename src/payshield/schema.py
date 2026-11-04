@@ -1,15 +1,34 @@
 from datetime import datetime
+from typing import Optional
+
 from pydantic import BaseModel, ConfigDict
 
+class RegisterRequest(BaseModel):
+    username: str
+    email: str
+    password: str
+    role: str = 'employee'
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
 
 class UserSchema(BaseModel):
     username: str
     email: str
-    role: str = "employee"
+    role: str = 'employee'
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
 
+class UserResponse(BaseModel):
+    id: int
+    username: str
+    email: str
+    role: str
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
 
 class SessionSchema(BaseModel):
     user_id: int
@@ -41,16 +60,6 @@ class PayrollRecordSchema(BaseModel):
     currency: str = "USD"
     bonus_cents: int = 0
     updated_at: datetime
-
-    model_config = ConfigDict(from_attributes=True)
-
-
-class UserResponse(BaseModel):
-    id: int
-    username: str
-    email: str
-    role: str
-    created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
 

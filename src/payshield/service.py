@@ -1,10 +1,20 @@
 import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Optional
-from payshield import SessionModel, hash_token_256, SessionSchema, SessionResponse
+
+from fastapi import HTTPException
+
+from payshield import (
+    SessionModel,
+    UserModel,
+    hash_token_256,
+    SessionSchema,
+    SessionResponse,
+    UserResponse,
+    PayrollRecordResponse, async_hash_password, async_verify_password,
+)
 from payshield.repository import SessionRepository, UserRepository, PayrollRecordRepository
 from payshield.schema import SessionAuthResult
-
 
 class UserService:
     def __init__(self, repository: UserRepository) -> None:
@@ -13,9 +23,58 @@ class UserService:
         """
         self.repository = repository
 
+    async def register_user(
+            self,
+            username: str,
+            email: str,
+            password: str,
+            role: str = "employee"
+    ) -> UserResponse:
+
+        user = self.repository.get_by_email(email)
+
+        if user:
+            raise HTTPException(
+                status_code=400,
+                detail="Username or email already registered"
+            )
+
+        hash_user_password = await async_hash_password(password)
+
+        result = self.repository.create(UserModel(
+            username=username,
+            email=email,
+            hashed_password=hash_user_password,
+            role=role
+        ))
+        return UserResponse.model_validate(result)
+
+    async def authenticate_user(
+            self,
+            username: str,
+            password: str
+    ) -> Optional[UserModel]:
+        get_user = self.repository.get_by_username(username)
+
+        if get_user is None:
+            return None
+
+        verify_pass = await async_verify_password(password, get_user.hashed_password)
+
+        if not verify_pass:
+            return None
+
+        return get_user
+
 class PayrollRecordService:
     def __init__(self, repository: PayrollRecordRepository) -> None:
         self.repository = repository
+
+    def get_my_salary(self, user_id: int) -> Optional[PayrollRecordResponse]:
+        payroll_record = self.repository.get_by_user_id(user_id)
+        if payroll_record is None:
+            return None
+        return PayrollRecordResponse.model_validate(payroll_record)
 
 class SessionService:
     def __init__(self, repository: SessionRepository) -> None:
@@ -45,8 +104,8 @@ class SessionService:
             tuple[SessionModel, str]: (db_session_record, raw_token)
         """
 
-        session_id =secrets.token_urlsafe(16)
-        hash_session = hash_token_256(session_id)
+        raw_token = secrets.token_urlsafe(16)
+        hash_session = hash_token_256(raw_token)
 
         now = datetime.now(timezone.utc)
 
@@ -60,14 +119,11 @@ class SessionService:
         )
 
         created = self.repository.create(SessionModel(**session_model.model_dump()))
-        if not created:
-            raise RuntimeError("Failed to create customer session in database.")
-
         safe_session = SessionResponse.model_validate(created)
 
         return SessionAuthResult (
             session=safe_session,
-            raw_token=session_id
+            raw_token=raw_token
         )
 
 

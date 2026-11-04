@@ -20,6 +20,7 @@ dependencies = [
     "dotenv>=0.9.9",
     "python-dotenv>=1.2.4",
     "email-validator>=2.3.0",
+    "pydantic>=2.14.2",
 ]
 
 [project.scripts]
