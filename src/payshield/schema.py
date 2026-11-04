@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Literal
 
 from pydantic import BaseModel, ConfigDict
 
@@ -7,7 +7,6 @@ class RegisterRequest(BaseModel):
     username: str
     email: str
     password: str
-    role: str = 'employee'
 
 class LoginRequest(BaseModel):
     username: str
@@ -16,7 +15,7 @@ class LoginRequest(BaseModel):
 class UserSchema(BaseModel):
     username: str
     email: str
-    role: str = 'employee'
+    role: Literal['employee', 'admin'] = 'employee'
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
@@ -29,6 +28,12 @@ class UserResponse(BaseModel):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+class UserCreate(BaseModel):
+    username: str
+    email: str
+    password: str
+    role: Literal['employee', 'admin'] = 'employee'
 
 class SessionSchema(BaseModel):
     user_id: int

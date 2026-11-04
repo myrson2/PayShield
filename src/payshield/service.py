@@ -14,7 +14,8 @@ from payshield import (
     PayrollRecordResponse, async_hash_password, async_verify_password,
 )
 from payshield.repository import SessionRepository, UserRepository, PayrollRecordRepository
-from payshield.schema import SessionAuthResult
+from payshield.schema import SessionAuthResult, UserCreate
+
 
 class UserService:
     def __init__(self, repository: UserRepository) -> None:
@@ -31,9 +32,10 @@ class UserService:
             role: str = "employee"
     ) -> UserResponse:
 
-        user = self.repository.get_by_email(email)
+        user_email = self.repository.get_by_email(email)
+        user_username = self.repository.get_by_username(username)
 
-        if user:
+        if user_email or user_username:
             raise HTTPException(
                 status_code=400,
                 detail="Username or email already registered"
