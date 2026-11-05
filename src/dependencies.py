@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import Depends, Request
+from fastapi import Depends, Request, status, HTTPException
 from sqlalchemy.orm import Session
 
 from payshield import get_db, UserModel
@@ -38,9 +38,34 @@ def get_payroll_record_service(
 ) -> PayrollRecordService:
     return PayrollRecordService(repository)
 
-async def get_current_user(
+def get_current_user(
         request: Request,
         session_service: Annotated[SessionService, Depends(get_session_service)],
         user_repository: Annotated[UserRepository, Depends(get_user_repository)],
 ) -> UserModel:
-    pass
+    raw_token = request.cookies.get("session_id")
+    if not raw_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated",
+        )
+
+    session = session_service.validate_session(raw_token=raw_token)
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired session"
+        )
+
+    user = user_repository.get_by_id(user_id=session.user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User does not exist",
+        )
+
+    return user
+
+
+
+
