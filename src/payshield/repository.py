@@ -107,10 +107,11 @@ class SessionRepository(BaseRepository):
         self.db.commit()
         return True
 
-    def delete_all_session(self, user_id: int, excluded_session_id: Optional[int] = None) -> int:
-        stmt = select(SessionModel).where(SessionModel.user_id == user_id)
-        if excluded_session_id is not None:
-            stmt = stmt.where(SessionModel.id != excluded_session_id)
+    def delete_all_session(self, user_id: int, excluded_session_id: int) -> int:
+        stmt = select(SessionModel).where(
+            SessionModel.user_id == user_id,
+            SessionModel.id == excluded_session_id
+        )
 
         result = list(self.db.scalars(stmt).all())
 

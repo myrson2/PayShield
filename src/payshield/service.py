@@ -199,7 +199,7 @@ class SessionService:
     def revoke_all_sessions(
             self,
             user_id: int,
-            keep_session_id: Optional[int] = None
+            keep_session_id: int
     ) -> int:
         """
         Revoke all active sessions for a user, with optional retention for the current device.
