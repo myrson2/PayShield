@@ -74,7 +74,7 @@ In corporate HR and payroll systems, security failures lead to direct compliance
 
 You will build this project step-by-step. After each milestone, your Senior Tutor will review your implementation, analyze design choices, and guide you to the next step.
 
-### 📌 Milestone 1: Database Setup, Domain Models & Migrations (`model.py`, `alembic/`, `test_models.py`) ✅ [COMPLETED]
+### 📌 Milestone 1: Database Setup, Domain Models & Migrations (`model.py`, `alembic/`, `test_models.py`) 
 - [x] Configure SQLite database engine with thread check disabled (`check_same_thread=False`) and `PRAGMA foreign_keys=ON`.
 - [x] Write the SQLAlchemy 2.0 models: `User`, `Session`, and `PayrollRecord`.
 - [x] Ensure proper relationships, cascade deletion, and indexing on `session_token`.
@@ -83,7 +83,7 @@ You will build this project step-by-step. After each milestone, your Senior Tuto
 - [x] Generate and apply initial migration (`alembic upgrade head`) to establish version-controlled DDL (`c5ea40568d1c_create_initial_schema.py`).
 - [x] Create automated edge-case test suite (`test_models.py`) testing cascades, unique constraints, and defaults.
 
-### 📌 Milestone 2: Cryptographic Security Utilities (`payshield/security.py`, `test_security.py`) ✅ [COMPLETED]
+### 📌 Milestone 2: Cryptographic Security Utilities (`payshield/security.py`, `test_security.py`)
 - [x] Implement `hash_token_256(token: str) -> str` returning 64-character lowercase SHA-256 hex digest.
 - [x] Implement non-blocking password hashing and verification using `asyncio.to_thread(hash_password, ...)` and `asyncio.to_thread(verify_password, ...)`.
 - [x] Handle UTF-8 encoding and decoding cleanly for `bcrypt` byte inputs and string storage.
