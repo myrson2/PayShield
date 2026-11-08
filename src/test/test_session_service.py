@@ -205,7 +205,6 @@ def test_revoke_all_sessions(session_service, test_user):
     # s3 should remain valid
     assert session_service.validate_session(s3.raw_token) is not None
 
-    # Now revoke all without exclusion
     final_deleted = session_service.revoke_all_sessions(user_id=test_user.id)
     assert final_deleted == 1
     assert session_service.validate_session(s3.raw_token) is None

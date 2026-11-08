@@ -41,7 +41,7 @@ async def login(
 
     authenticate_user = await user_service.authenticate_user(username=payload.username, password=payload.password)
     if authenticate_user is None:
-        raise HTTPException(status_code=404, detail="Invalid Credentials")
+        raise HTTPException(status_code=401, detail="Invalid Credentials")
 
     session = session_service.create_session(
         user_id=authenticate_user.id,
@@ -70,7 +70,7 @@ async def logout(
     raw_token = request.cookies.get("session_id")
 
     if raw_token is None:
-        raise HTTPException(status_code=401, detail="Invalid Credentials")
+        raise HTTPException(status_code=404, detail="Session not found or unauthorized")
 
     session = session_service.validate_session(raw_token)
     if session:
@@ -110,10 +110,7 @@ async def revoke_session(
 
     if not success:
         # Return 404 for both nonexistent and other-user sessions to prevent IDOR/enumeration
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Session not found or unauthorized"
-        )
+        raise HTTPException(status_code=404, detail="Session not found or unauthorized")
 
     return {"message": "Session revoked successfully"}
 
@@ -127,18 +124,12 @@ async def revoke_all_sessions(
     """Revoke all sessions except the currently active one."""
     raw_token = request.cookies.get("session_id")
     if not raw_token:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authenticated"
-        )
+        raise HTTPException(status_code=404, detail="Session not found or unauthorized")
 
     # Resolve session using the raw token cookie
     current_session = session_service.validate_session(raw_token)
     if not current_session:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid session"
-        )
+        raise HTTPException(status_code=404, detail="Session not found or unauthorized")
 
     # Revoke all other sessions belonging to this user, keeping the current one active
     revoked_count = session_service.revoke_all_sessions(

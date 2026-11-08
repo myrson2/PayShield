@@ -1,9 +1,13 @@
 import sys
+import os
 from pathlib import Path
 import pytest
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.engine import Engine
+
+# Keep imports that initialize the application engine away from the configured database.
+os.environ["DATABASE_URL"] = "sqlite:///:memory:"
 
 from payshield.model import Base
 

@@ -95,23 +95,28 @@ class SessionRepository(BaseRepository):
                 ).order_by(SessionModel.created_at.desc())
         return list(self.db.scalars(stmt).all())
 
-    def delete_session(self, session_id: int, user_id: Optional[int] = None) -> bool:
-        stmt = select(SessionModel).where(SessionModel.id == session_id)
-        if user_id is not None:
-            stmt = stmt.where(SessionModel.user_id == user_id)
+    def delete_session(self, session_id: int, user_id: int) -> bool:
+        stmt = select(SessionModel).where(
+            SessionModel.id == session_id,
+            SessionModel.user_id == user_id
+        )
 
         session = self.db.scalar(stmt)
+
         if not session:
             return False
+
         self.db.delete(session)
         self.db.commit()
         return True
 
-    def delete_all_session(self, user_id: int, excluded_session_id: int) -> int:
+    def delete_all_session(self, user_id: int, keep_session_id: Optional[int]) -> int:
         stmt = select(SessionModel).where(
-            SessionModel.user_id == user_id,
-            SessionModel.id == excluded_session_id
+            SessionModel.user_id == user_id
         )
+
+        if keep_session_id:
+            stmt = stmt.where(SessionModel.id != keep_session_id)
 
         result = list(self.db.scalars(stmt).all())
 

@@ -1,4 +1,5 @@
 import secrets
+import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
@@ -106,7 +107,7 @@ class SessionService:
             tuple[SessionModel, str]: (db_session_record, raw_token)
         """
 
-        raw_token = secrets.token_urlsafe(16)
+        raw_token = secrets.token_urlsafe(uuid.uuid4())
         hash_session = hash_token_256(raw_token)
 
         now = datetime.now(timezone.utc)
@@ -182,7 +183,7 @@ class SessionService:
     def revoke_session(
             self,
             session_id: int,
-            user_id: Optional[int] = None
+            user_id: int
     ) -> bool:
         """
         Invalidate and remove a specific session from the database.
@@ -199,7 +200,7 @@ class SessionService:
     def revoke_all_sessions(
             self,
             user_id: int,
-            keep_session_id: int
+            keep_session_id: Optional[int] = None
     ) -> int:
         """
         Revoke all active sessions for a user, with optional retention for the current device.
